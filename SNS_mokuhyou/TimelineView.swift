@@ -75,15 +75,13 @@ struct TimelineView: View {
             }
         }
     }
+    
 }
-
-
 
 
 
 
 
 #Preview {
-  TimelineView()
+TimelineView()
 }
-

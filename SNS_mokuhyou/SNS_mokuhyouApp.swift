@@ -25,7 +25,7 @@ struct SNS_mokuhyouApp: App {
 
     var body: some Scene {
         WindowGroup {
-            TimelineView()
+            TimelineView() 
         }
         .modelContainer(sharedModelContainer)
     }
