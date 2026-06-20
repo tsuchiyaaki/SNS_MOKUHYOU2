@@ -25,7 +25,7 @@ struct SNS_mokuhyouApp: App {
 
     var body: some Scene {
         WindowGroup {
-            ContentView(Date: "")
+            ContentView()
         }
         .modelContainer(sharedModelContainer)
     }
