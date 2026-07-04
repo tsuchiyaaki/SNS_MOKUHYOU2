@@ -1,25 +1,25 @@
-//
-//  ContentView.swift
-//  SNS_mokuhyou
-//
-//  Created by 土屋　暁 on 2026/05/23.
-//
 import SwiftUI
+import SwiftData
 
 struct TimelineView: View {
+    @Query(sort: \Post.createdAt, order: .reverse) var posts: [Post]
+
+    @State private var showNewPost = false   // 投稿画面を出すかどうか
+
+    @Environment(\.modelContext) var context   // 構造体の上のほうに追加
+
+    func deletePost(_ post: Post) {
+        context.delete(post)   // 削除する
+    }
     var body: some View {
         ZStack {
             Color(red: 0.88, green: 0.92, blue: 0.98)
                 .ignoresSafeArea()
 
             VStack(spacing: 20) {
-
-               
                 HStack {
                     Spacer()
-
-                    Button{
-                        
+                    Button {
                     } label: {
                         Image(systemName: "person.crop.circle")
                             .font(.system(size: 50))
@@ -29,37 +29,33 @@ struct TimelineView: View {
                 }
 
                 ScrollView(showsIndicators: false) {
-
                     VStack(spacing: 25) {
-
-                        FeedCard(
-                            name: "T.A",
-                            iconColor: .red
-                        )
-
-                        FeedCard(
-                            name: "ひらけー",
-                            iconColor: .black
-                        )
+                        ForEach(posts) { post in
+                            FeedCard(post: post, iconColor: .red)
+                                .contextMenu {                 // 長押しでメニューを出す
+                                    Button(role: .destructive) {
+                                        deletePost(post)
+                                    } label: {
+                                        Label("削除", systemImage: "trash")
+                                    }
+                                }
+                        }
                     }
                     .padding(.horizontal)
                 }
-
                 Spacer()
-
-               
-              
             }
 
-         
+            @Environment(\.modelContext) var context   // 構造体の上のほうに追加
+
+          
+            // 「＋」ボタン
             VStack {
                 Spacer()
-
                 HStack {
                     Spacer()
-
                     Button {
-
+                        showNewPost = true        // 押したら投稿画面を出す
                     } label: {
                         Image(systemName: "plus")
                             .font(.system(size: 30))
@@ -74,14 +70,13 @@ struct TimelineView: View {
                 }
             }
         }
+        // 投稿画面をシート（下からせり出す画面）で表示する
+        .sheet(isPresented: $showNewPost) {
+            NewPostView()
+        }
     }
-    
 }
-
-
-
-
-
 #Preview {
-TimelineView()
+    TimelineView()
+        .modelContainer(for: Post.self, inMemory: true)
 }

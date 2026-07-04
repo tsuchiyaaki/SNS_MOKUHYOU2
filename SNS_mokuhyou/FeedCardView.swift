@@ -1,29 +1,23 @@
-
-//
-//  aa.swift
-//  SNS_mokuhyou
-//
-//  Created by 土屋　暁 on 2026/06/20.
-//
-
 import SwiftUI
 
 struct FeedCard: View {
 
-    let name: String
+    let post: Post                 // Post データを受け取る
     let iconColor: Color
 
     var body: some View {
 
+        
+
         VStack(alignment: .leading, spacing: 20) {
 
             HStack {
-
                 Image(systemName: "person.crop.circle")
                     .font(.title)
                     .foregroundColor(iconColor)
 
-                Text(name)
+                
+                Text(post.name)        // 固定の name → post.name
                     .font(.title)
                     .fontWeight(.bold)
                     .foregroundColor(.gray)
@@ -31,7 +25,7 @@ struct FeedCard: View {
                 Spacer()
             }
 
-            Text("昨日から")
+            Text(post.selectedDate)
                 .font(.largeTitle)
                 .fontWeight(.bold)
 
@@ -39,39 +33,33 @@ struct FeedCard: View {
 
                 HStack {
                     Spacer()
-
                     Capsule()
                         .fill(Color.gray.opacity(0.25))
                         .frame(width: 250, height: 80)
                         .overlay(
-                            Text("一日の歩数")
+                            Text(post.subject)    // 「一日の歩数」→ post.subject
                                 .font(.system(size: 30, weight: .bold))
                         )
-
                     Text("が")
                         .font(.title)
-
                     Spacer()
                 }
 
                 HStack {
                     Spacer()
-
                     Capsule()
                         .fill(Color.gray.opacity(0.25))
                         .frame(width: 250, height: 80)
                         .overlay(
-                            Text("3倍")
+                            Text(post.change)     // 「3倍」→ post.change
                                 .font(.system(size: 32, weight: .bold))
                         )
-
                     Spacer()
                 }
 
                 HStack {
                     Spacer()
-
-                    Text("増えた")
+                    Text(post.selectedchange)
                         .font(.title)
                         .fontWeight(.bold)
                 }
@@ -80,13 +68,14 @@ struct FeedCard: View {
         .padding()
         .background(Color.white)
         .cornerRadius(30)
-        .shadow(color: .black.opacity(0.1),
-                radius: 5,
-                x: 0,
-                y: 3)
+        .shadow(color: .black.opacity(0.1), radius: 5, x: 0, y: 3)
     }
 }
 
 #Preview {
-    FeedCard(name: "T.A", iconColor: .red)
+    // Preview用のサンプル投稿を渡す
+    FeedCard(
+        post: Post(name: "T.A", subject: "一日の歩数", change: "3倍", selectedDate: "a",selectedchange: "a"),
+        iconColor: .red
+    )
 }

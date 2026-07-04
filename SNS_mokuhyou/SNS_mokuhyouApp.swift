@@ -1,10 +1,3 @@
-//
-//  SNS_mokuhyouApp.swift
-//  SNS_mokuhyou
-//
-//  Created by 土屋　暁 on 2026/05/23.
-//
-
 import SwiftUI
 import SwiftData
 
@@ -12,7 +5,7 @@ import SwiftData
 struct SNS_mokuhyouApp: App {
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
-            Item.self,
+            Post.self,        // Item.self から Post.self に変更
         ])
         let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
 
@@ -25,7 +18,7 @@ struct SNS_mokuhyouApp: App {
 
     var body: some Scene {
         WindowGroup {
-            TimelineView() 
+            TimelineView()
         }
         .modelContainer(sharedModelContainer)
     }

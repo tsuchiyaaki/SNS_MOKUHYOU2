@@ -8,6 +8,6 @@
 import SwiftUI
 struct SarchView: View {
     var body: some View {
-        SearchFieldPlacement
+       
     }
 }
