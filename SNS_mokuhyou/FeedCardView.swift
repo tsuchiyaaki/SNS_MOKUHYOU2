@@ -17,18 +17,20 @@ struct FeedCard: View {
                     .foregroundColor(iconColor)
 
                 
-                Text(post.name)        // 固定の name → post.name
+                Text(.name)        // 固定の name → post.name
                     .font(.title)
                     .fontWeight(.bold)
                     .foregroundColor(.gray)
 
                 Spacer()
             }
-
-            Text(post.selectedDate)
-                .font(.largeTitle)
-                .fontWeight(.bold)
-
+            HStack{
+                Text(post.selectedDate)
+                    .font(.largeTitle)
+                    .fontWeight(.bold)
+                
+                Text("から")
+            }
             VStack(spacing: 20) {
 
                 HStack {
