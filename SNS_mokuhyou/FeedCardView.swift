@@ -4,7 +4,7 @@ struct FeedCard: View {
 
     let post: Post                 // Post データを受け取る
     let iconColor: Color
-
+//    let Userdata : UserData
     var body: some View {
 
         
@@ -17,10 +17,10 @@ struct FeedCard: View {
                     .foregroundColor(iconColor)
 
                 
-                Text(post.name)        // 固定の name → post.name
-                    .font(.title)
-                    .fontWeight(.bold)
-                    .foregroundColor(.gray)
+//                Text(AppUser.userName)       // 固定の name → post.name
+//                    .font(.title)
+//                    .fontWeight(.bold)
+//                    .foregroundColor(.gray)
 
                 Spacer()
             }
@@ -77,7 +77,7 @@ struct FeedCard: View {
 #Preview {
     // Preview用のサンプル投稿を渡す
     FeedCard(
-        post: Post(name: "T.A", subject: "一日の歩数", change: "3倍", selectedDate: "a",selectedchange: "a"),
+        post: Post(subject: "一日の歩数", change: "3倍", selectedDate: "a",selectedchange: "a"),
         iconColor: .red
     )
 }

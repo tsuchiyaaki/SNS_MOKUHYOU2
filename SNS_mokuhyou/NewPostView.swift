@@ -12,7 +12,6 @@ struct NewPostView: View {
     @Environment(\.modelContext) var context
     @Environment(\.dismiss) var dismiss      // 画面を閉じるための仕組み
 
-    @State private var name = ""
     @State private var subject = ""
     @State private var change = ""
     let secsionDate = ["昨日", "一週間", "一ヶ月", "半年", "一年"]
@@ -41,9 +40,6 @@ struct NewPostView: View {
                             .font(.headline)
             
             Form {
-                Section("だれが") {
-                    TextField("名前（例：T.A）", text: $name)
-                }
                 Section("なにが") {
                     TextField("1つ目（例：一日の歩数）", text: $subject)
                 }
@@ -82,8 +78,8 @@ struct NewPostView: View {
     }
 
     func addPost() {
-        guard !name.isEmpty else { return }   // 名前が空なら何もしない
-        let post = Post(name: name, subject: subject, change: change,selectedDate:selectedDate,selectedchange: selectedchange)
+        
+        let post = Post(subject: subject, change: change,selectedDate:selectedDate,selectedchange: selectedchange)
         context.insert(post)   // 保存する
         dismiss()              // 投稿したら画面を閉じる
     }
