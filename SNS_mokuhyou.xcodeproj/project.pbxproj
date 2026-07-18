@@ -16,22 +16,9 @@
 		07F92F2A2FC1951800B8DA20 /* SNS_mokuhyou.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SNS_mokuhyou.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
-/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		07660EFA300B5B8600AB9AF5 /* Exceptions for "SNS_mokuhyou" folder in "SNS_mokuhyou" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				"SNS-mokuhyou-Info.plist",
-			);
-			target = 07F92F292FC1951800B8DA20 /* SNS_mokuhyou */;
-		};
-/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
-
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		07F92F2C2FC1951800B8DA20 /* SNS_mokuhyou */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				07660EFA300B5B8600AB9AF5 /* Exceptions for "SNS_mokuhyou" folder in "SNS_mokuhyou" target */,
-			);
 			path = SNS_mokuhyou;
 			sourceTree = "<group>";
 		};

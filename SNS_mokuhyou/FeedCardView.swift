@@ -4,7 +4,7 @@ struct FeedCard: View {
 
     let post: Post                 // Post データを受け取る
     let iconColor: Color
-    let Userdata : UserData
+    let Userdata : UserData 
     var body: some View {
 
         
