@@ -6,13 +6,32 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		07660EF4300B523100AB9AF5 /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = 07660EF3300B523100AB9AF5 /* FirebaseCore */; };
+		07660EF6300B525200AB9AF5 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 07660EF5300B525200AB9AF5 /* FirebaseAuth */; };
+		07660EF8300B58B000AB9AF5 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 07660EF7300B58B000AB9AF5 /* FirebaseFirestore */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		07F92F2A2FC1951800B8DA20 /* SNS_mokuhyou.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SNS_mokuhyou.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		07660EFA300B5B8600AB9AF5 /* Exceptions for "SNS_mokuhyou" folder in "SNS_mokuhyou" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				"SNS-mokuhyou-Info.plist",
+			);
+			target = 07F92F292FC1951800B8DA20 /* SNS_mokuhyou */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		07F92F2C2FC1951800B8DA20 /* SNS_mokuhyou */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				07660EFA300B5B8600AB9AF5 /* Exceptions for "SNS_mokuhyou" folder in "SNS_mokuhyou" target */,
+			);
 			path = SNS_mokuhyou;
 			sourceTree = "<group>";
 		};
@@ -23,16 +42,27 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				07660EF4300B523100AB9AF5 /* FirebaseCore in Frameworks */,
+				07660EF6300B525200AB9AF5 /* FirebaseAuth in Frameworks */,
+				07660EF8300B58B000AB9AF5 /* FirebaseFirestore in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		07660EF2300B523100AB9AF5 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		07F92F212FC1951800B8DA20 = {
 			isa = PBXGroup;
 			children = (
 				07F92F2C2FC1951800B8DA20 /* SNS_mokuhyou */,
+				07660EF2300B523100AB9AF5 /* Frameworks */,
 				07F92F2B2FC1951800B8DA20 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -65,6 +95,9 @@
 			);
 			name = SNS_mokuhyou;
 			packageProductDependencies = (
+				07660EF3300B523100AB9AF5 /* FirebaseCore */,
+				07660EF5300B525200AB9AF5 /* FirebaseAuth */,
+				07660EF7300B58B000AB9AF5 /* FirebaseFirestore */,
 			);
 			productName = SNS_mokuhyou;
 			productReference = 07F92F2A2FC1951800B8DA20 /* SNS_mokuhyou.app */;
@@ -94,6 +127,9 @@
 			);
 			mainGroup = 07F92F212FC1951800B8DA20;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				0769F2B0300B4FB600791C5F /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 07F92F2B2FC1951800B8DA20 /* Products */;
 			projectDirPath = "";
@@ -183,6 +219,10 @@
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
+				"OTHER_LDFLAGS[arch=*]" = (
+					"$(inherited)",
+					"-ObjC",
+				);
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -240,6 +280,10 @@
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
+				"OTHER_LDFLAGS[arch=*]" = (
+					"$(inherited)",
+					"-ObjC",
+				);
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
 			};
@@ -259,6 +303,7 @@
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "SNS-mokuhyou-Info.plist";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -304,6 +349,7 @@
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "SNS-mokuhyou-Info.plist";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -357,6 +403,35 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		0769F2B0300B4FB600791C5F /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 12.16.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		07660EF3300B523100AB9AF5 /* FirebaseCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 0769F2B0300B4FB600791C5F /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseCore;
+		};
+		07660EF5300B525200AB9AF5 /* FirebaseAuth */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 0769F2B0300B4FB600791C5F /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAuth;
+		};
+		07660EF7300B58B000AB9AF5 /* FirebaseFirestore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 0769F2B0300B4FB600791C5F /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseFirestore;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 07F92F222FC1951800B8DA20 /* Project object */;
 }

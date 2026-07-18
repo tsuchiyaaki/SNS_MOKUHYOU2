@@ -1,8 +1,22 @@
 import SwiftUI
 import SwiftData
+import FirebaseCore
+
+class AppDelegate: NSObject, UIApplicationDelegate {
+  func application(_ application: UIApplication,
+                   didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
+    FirebaseApp.configure()
+
+    return true
+  }
+}
 
 @main
 struct SNS_mokuhyouApp: App {
+    // register app delegate for Firebase setup
+     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
+
+    
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
             Post.self,        // Item.self から Post.self に変更
@@ -18,7 +32,10 @@ struct SNS_mokuhyouApp: App {
 
     var body: some Scene {
         WindowGroup {
-            TimelineView()
+            NavigationView {
+                  TimelineView()
+                  }
+                
         }
         .modelContainer(sharedModelContainer)
     }

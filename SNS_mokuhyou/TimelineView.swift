@@ -21,7 +21,7 @@ struct TimelineView: View {
                     HStack {
                         Spacer()
                         NavigationLink{
-                            MyAcountView()
+                            MyAcountView(userdata: UserData(id: "1", userName: "T.A", accountID: "a"))
                         } label: {
                             Image(systemName: "person.crop.circle")
                                 .font(.system(size: 50))
@@ -33,7 +33,7 @@ struct TimelineView: View {
                     ScrollView(showsIndicators: false) {
                         VStack(spacing: 25) {
                             ForEach(posts) { post in
-                                FeedCard(post: post, iconColor: .red)
+                                FeedCard(post: post, iconColor: .red,Userdata: UserData(id: "1", userName: "1", accountID: "1"))
                                     .contextMenu {                 // 長押しでメニューを出す
                                         Button(role: .destructive) {
                                             deletePost(post)
