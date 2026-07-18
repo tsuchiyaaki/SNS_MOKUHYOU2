@@ -6,113 +6,81 @@
 //
 import SwiftUI
 
-struct CostomMyAcountView :View{
-     
-    @State private var name = "T.A"
+struct ProfileEditView: View {
+    @EnvironmentObject private var userStore: UserStore
+    @Environment(\.dismiss) private var dismiss
+
+    @State private var userName = ""
     @State private var bio = ""
-    @State private var birthDate = Date()
-    
+    @State private var isSaving = false
+    @State private var errorMessage: String?
+
     var body: some View {
-        VStack {
-            
-            // 上のバー
-            HStack {
-                
-                Spacer()
-                
-                Text("Title")
-                    .font(.title2)
-                    .bold()
-                
-                Spacer()
-                
-                Button {
-                    // 保存処理
-                } label: {
-                    Image(systemName: "arrow.up")
-                        .font(.system(size: 25))
-                        .foregroundColor(.white)
-                        .frame(width: 40, height: 40)
-                        .background(Color.blue)
-                        .clipShape(Circle())
-                }
+        Form {
+            Section("名前") {
+                TextField("表示名", text: $userName)
+                Text("\(userName.count)/20文字")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
             }
-            .padding(.horizontal, 28)
-            .padding(.top, 20)
-            .frame(height: 130)
-            
-         
-            
-            // プロフィール画像エリア
-            HStack {
-                Image(systemName: "person.circle")
-                    .font(.system(size: 50))
-                    .foregroundColor(.red)
-                    .padding(.leading, 28)
-                
-                Spacer()
+
+            Section("自己紹介") {
+                TextField("100文字以内", text: $bio, axis: .vertical)
+                    .lineLimit(3...6)
+                Text("\(bio.count)/100文字")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
             }
-            .frame(height: 80)
-            
-            Divider()
-            
-            // 名前
-            HStack {
-                Text("名前")
-                    .font(.title3)
-                    .bold()
-                    .frame(width: 120, alignment: .leading)
-                
-                TextField("", text: $name)
-                    .font(.system(size: 34, weight: .bold))
+
+            Section("変更できないID") {
+                Text("@\(userStore.currentUser?.accountID ?? "")")
+                    .foregroundStyle(.secondary)
             }
-            .padding(.horizontal, 40)
-            .frame(height: 70)
-            
-            Divider()
-            
-            // 自己紹介
-            HStack(alignment: .top) {
-                Text("自己紹介")
-                    .font(.title3)
-                    .bold()
-                    .frame(width: 120, alignment: .leading)
-                
-                TextField("", text: $bio, axis: .vertical)
-                    .font(.title3)
-            }
-            .padding(.horizontal, 40)
-            .padding(.top, 25)
-            .frame(height: 140)
-            
-            Divider()
-            
-            // 生年月日
-            HStack {
-                Text("生年月日")
-                    .font(.title3)
-                    .bold()
-                    .frame(width: 150, alignment: .leading)
-                
-                DatePicker(
-                    "",
-                    selection: $birthDate,
-                    displayedComponents: .date
-                )
-                .labelsHidden()
-                .datePickerStyle(.compact)
-                
-                Spacer()
-            }
-            .padding(.horizontal, 40)
-            .frame(height: 90)
-            
-            Spacer()
         }
-        .background(Color.white)
+        .navigationTitle("プロフィール編集")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .confirmationAction) {
+                Button(isSaving ? "保存中…" : "保存") {
+                    Task {
+                        await save()
+                    }
+                }
+                .disabled(
+                    userName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ||
+                    userName.count > 20 ||
+                    bio.count > 100 ||
+                    isSaving
+                )
+            }
+        }
+        .task {
+            guard let profile = userStore.currentUser else { return }
+            userName = profile.userName
+            bio = profile.bio
+        }
+        .alert("保存できませんでした", isPresented: Binding(
+            get: { errorMessage != nil },
+            set: { if !$0 { errorMessage = nil } }
+        )) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text(errorMessage ?? "不明なエラーです")
+        }
     }
-}
-    
-#Preview {
-    CostomMyAcountView()
+
+    private func save() async {
+        isSaving = true
+
+        do {
+            try await userStore.updateProfile(
+                userName: userName,
+                bio: bio
+            )
+            dismiss()
+        } catch {
+            errorMessage = error.localizedDescription
+            isSaving = false
+        }
+    }
 }

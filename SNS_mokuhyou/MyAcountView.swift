@@ -1,66 +1,71 @@
 import SwiftUI
-import SwiftData
 
 struct MyAcountView: View {
-    let userdata: UserData
+    @EnvironmentObject private var authManager: AuthManager
+    @EnvironmentObject private var userStore: UserStore
+    @EnvironmentObject private var postStore: PostStore
 
-    // 保存された投稿を新しい順に読み込む
-    @Query(sort: \Post.createdAt, order: .reverse) var posts: [Post]
-    @State private var showSheet = false
+    private var myPosts: [Post] {
+        guard let userID = authManager.userID else { return [] }
+        return postStore.posts.filter { $0.authorID == userID }
+    }
+
     var body: some View {
-        NavigationStack {
-            ZStack {
-                Color(red: 0.88, green: 0.92, blue: 0.98)
-                    .ignoresSafeArea()
-                ScrollView(showsIndicators: false) {
-                    VStack(spacing: 20) {
-                        HStack {
-                            Spacer()
-                            Button {
-                                showSheet = true
-                            } label: {
-                                Image(systemName: "pencil.line")
-                                    .font(.system(size: 20))
-                                    .foregroundColor(.black)
-                                    .frame(width: 50, height: 50)
-                                    .background(Color.white.opacity(0.9))
-                                    .clipShape(Circle())
-                                    .shadow(radius: 5)
-                            }
-                            .sheet(isPresented: $showSheet){
-                                CostomMyAcountView()
-                            }
-                            
-                            .padding(.horizontal, 30)
-                        }
-                        VStack {
-                            Image(systemName: "person.crop.circle")
-                                .font(.system(size: 100))
-                                .foregroundColor(.red)
-                            Text(userdata.userName)
-                                .font(.title)
-                                .fontWeight(.bold)
-                                .foregroundColor(.gray)
-                        }
+        ZStack {
+            Color(red: 0.88, green: 0.92, blue: 0.98)
+                .ignoresSafeArea()
 
-                        Divider()
-                            .background(Color.black.opacity(0.2))
+            ScrollView(showsIndicators: false) {
+                VStack(spacing: 20) {
+                    Image(systemName: "person.crop.circle")
+                        .font(.system(size: 100))
+                        .foregroundColor(.red)
 
+                    Text(userStore.currentUser?.userName ?? "読込中…")
+                        .font(.title)
+                        .fontWeight(.bold)
+                        .foregroundColor(.gray)
+
+                    Text("@\(userStore.currentUser?.accountID ?? "")")
+                        .foregroundStyle(.secondary)
+
+                    if let bio = userStore.currentUser?.bio, !bio.isEmpty {
+                        Text(bio)
+                            .multilineTextAlignment(.center)
+                            .padding(.horizontal)
+                    }
+
+                    Text("自分の投稿：\(myPosts.count)件")
+                        .foregroundStyle(.secondary)
+
+                    NavigationLink {
+                        ProfileEditView()
+                    } label: {
+                        Label("プロフィールを編集", systemImage: "pencil")
+                    }
+                    .buttonStyle(.bordered)
+
+                    Divider()
+                        .background(Color.black.opacity(0.2))
+
+                    if myPosts.isEmpty {
+                        ContentUnavailableView(
+                            "自分の投稿はまだありません",
+                            systemImage: "person.crop.circle.badge.questionmark"
+                        )
+                    } else {
                         VStack(spacing: 25) {
-                            // 保存された投稿を並べる
-                            ForEach(posts) { post in
-                                FeedCard(post: post, iconColor: .red,Userdata: UserData(id: "1", userName: "1", accountID: "1"))
+                            ForEach(myPosts) { post in
+                                FeedCard(post: post, iconColor: .red)
                             }
                         }
                         .padding(.horizontal)
                     }
                 }
+                .padding(.vertical)
             }
         }
+        .navigationTitle("マイページ")
+        .navigationBarTitleDisplayMode(.inline)
     }
-}
-
-#Preview {
-    MyAcountView(userdata: UserData(id: "1", userName: "T.A", accountID: "1"))
-        .modelContainer(for: Post.self, inMemory: true)
 }

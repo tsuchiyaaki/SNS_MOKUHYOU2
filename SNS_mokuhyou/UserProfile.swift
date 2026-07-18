@@ -9,8 +9,7 @@ import SwiftData
 import Foundation
 import SwiftUI
 
-@Model
-final class UserData {
+struct UserProfile: Identifiable {
     var id: String        // Firebaseのuid
     var userName: String  // 表示名
     var accountID: String // @user_id みたいなID

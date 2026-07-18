@@ -6,82 +6,129 @@
 //
 
 import SwiftUI
-import SwiftData
 
 struct NewPostView: View {
-    @Environment(\.modelContext) var context
-    @Environment(\.dismiss) var dismiss      // 画面を閉じるための仕組み
+    @EnvironmentObject private var postStore: PostStore
+    @EnvironmentObject private var userStore: UserStore
+    @Environment(\.dismiss) private var dismiss
 
     @State private var subject = ""
     @State private var change = ""
-    let secsionDate = ["昨日", "一週間", "一ヶ月", "半年", "一年"]
     @State private var selectedDate = "昨日"
+    @State private var selectedChange = "上がった"
+    @State private var isPosting = false
+    @State private var errorMessage: String?
 
-    let sectionchange = ["上がった", "増えた", "下がった", "減った"]
-    @State private var selectedchange = "上がった"
-    
+    private let sectionDates = ["昨日", "一週間", "一ヶ月", "半年", "一年"]
+    private let sectionChanges = ["上がった", "増えた", "下がった", "減った"]
+
+    private var trimmedSubject: String {
+        subject.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    private var trimmedChange: String {
+        change.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    private var canPost: Bool {
+        !trimmedSubject.isEmpty &&
+        !trimmedChange.isEmpty &&
+        trimmedSubject.count <= 40 &&
+        trimmedChange.count <= 20 &&
+        userStore.currentUser != nil && !isPosting
+    }
+
     var body: some View {
         NavigationStack {
-            
-        
-            Text("いつから？")
-                            .font(.title2)
-                            .bold()
-
-                        Picker("いつから？", selection: $selectedDate) {
-                            ForEach(secsionDate, id: \.self) { secsionDate in
-                                Text(secsionDate)
-                            }
-                        }
-                        .pickerStyle(.wheel)
-                        .frame(height: 50)
-
-                        Text("選択中：\(selectedDate)")
-                            .font(.headline)
-            
             Form {
-                Section("なにが") {
-                    TextField("1つ目（例：一日の歩数）", text: $subject)
+                Section("投稿者") {
+                    Text(userStore.currentUser?.userName ?? "読込中…")
+                        .foregroundStyle(.secondary)
                 }
+
+                Section("いつから？") {
+                    Picker("いつから？", selection: $selectedDate) {
+                        ForEach(sectionDates, id: \.self) { date in
+                            Text(date)
+                        }
+                    }
+                    .pickerStyle(.wheel)
+                    .frame(height: 100)
+                }
+
+                Section("なにが") {
+                    TextField("例：一日の歩数", text: $subject)
+                    Text("40文字まで")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+
                 Section("どのくらい") {
-                    TextField("2つ目（例：3倍）", text: $change)
+                    TextField("例：3倍", text: $change)
+                    Text("20文字まで")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+
+                Section("どうなった？") {
+                    Picker("どうなった？", selection: $selectedChange) {
+                        ForEach(sectionChanges, id: \.self) { change in
+                            Text(change)
+                        }
+                    }
+                    .pickerStyle(.wheel)
+                    .frame(height: 100)
                 }
             }
-            Text("どうなった？")
-                            .font(.title2)
-                            .bold()
-
-                        Picker("どうなった？", selection: $selectedchange) {
-                            ForEach(sectionchange, id: \.self) { sectionchange in
-                                Text(sectionchange)
-                            }
-                        }
-                        .pickerStyle(.wheel)
-                        .frame(height: 50)
-
-                        Text("選択中：\(selectedchange)")
-                            .font(.headline)
             .navigationTitle("新しい投稿")
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("投稿") {
-                        addPost()
+                    Button(isPosting ? "送信中…" : "投稿") {
+                        Task {
+                            await submit()
+                        }
                     }
+                    .disabled(!canPost)
                 }
+
                 ToolbarItem(placement: .cancellationAction) {
                     Button("閉じる") {
                         dismiss()
                     }
+                    .disabled(isPosting)
                 }
+            }
+            .alert("投稿できませんでした", isPresented: Binding(
+                get: { errorMessage != nil },
+                set: { if !$0 { errorMessage = nil } }
+            )) {
+                Button("OK", role: .cancel) {}
+            } message: {
+                Text(errorMessage ?? "不明なエラーです")
             }
         }
     }
 
-    func addPost() {
-        
-        let post = Post(subject: subject, change: change,selectedDate:selectedDate,selectedchange: selectedchange)
-        context.insert(post)   // 保存する
-        dismiss()              // 投稿したら画面を閉じる
+    private func submit() async {
+        guard canPost else { return }
+        isPosting = true
+
+        do {
+            guard let profile = userStore.currentUser else {
+                throw UserStoreError.profileNotFound
+            }
+
+            try await postStore.addPost(
+                authorName: profile.userName,
+                subject: trimmedSubject,
+                change: trimmedChange,
+                selectedDate: selectedDate,
+                selectedChange: selectedChange
+            )
+            dismiss()
+        } catch {
+            errorMessage = error.localizedDescription
+            isPosting = false
+        }
     }
 }
-
