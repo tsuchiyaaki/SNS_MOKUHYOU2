@@ -7,7 +7,7 @@
 import SwiftUI
 
 struct CostomMyAcountView :View{
-    
+     
     @State private var name = "T.A"
     @State private var bio = ""
     @State private var birthDate = Date()
