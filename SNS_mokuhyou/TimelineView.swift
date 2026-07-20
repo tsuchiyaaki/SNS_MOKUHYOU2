@@ -76,6 +76,16 @@ struct TimelineView: View {
         VStack(spacing: 20) {
             HStack {
                 Spacer()
+
+                NavigationLink {
+                    SearchView()
+                } label: {
+                    Image(systemName: "magnifyingglass.circle")
+                        .font(.system(size: 48))
+                        .foregroundColor(.red)
+                }
+                .accessibilityLabel("投稿を検索")
+
                 NavigationLink {
                     MyAcountView()
                 } label: {
@@ -84,6 +94,7 @@ struct TimelineView: View {
                         .foregroundColor(.red)
                         .padding(.trailing, 20)
                 }
+                .accessibilityLabel("マイページ")
             }
 
             if postStore.posts.isEmpty {
