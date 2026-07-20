@@ -20,7 +20,19 @@ struct SNS_mokuhyouApp: App {
 
     var body: some Scene {
         WindowGroup {
-            TimelineView()
+            TabView {
+                TimelineView()
+                    .tabItem {
+                        Image(systemName: "house.fill")
+                    }
+
+                NavigationStack {
+                    SearchView()
+                }
+                .tabItem {
+                    Image( systemName: "magnifyingglass")
+                }
+            }
             .environmentObject(authManager)
             .environmentObject(userStore)
             .environmentObject(postStore)

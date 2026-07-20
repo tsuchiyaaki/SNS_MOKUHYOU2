@@ -78,15 +78,6 @@ struct TimelineView: View {
                 Spacer()
 
                 NavigationLink {
-                    SearchView()
-                } label: {
-                    Image(systemName: "magnifyingglass.circle")
-                        .font(.system(size: 48))
-                        .foregroundColor(.red)
-                }
-                .accessibilityLabel("投稿を検索")
-
-                NavigationLink {
                     MyAcountView()
                 } label: {
                     Image(systemName: "person.crop.circle")
@@ -141,6 +132,7 @@ struct TimelineView: View {
             }
             .padding(.trailing, 35)
             .padding(.bottom, 30)
+
         }
     }
 }
