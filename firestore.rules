@@ -1,0 +1,188 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function owns(userID) {
+      return signedIn() && request.auth.uid == userID;
+    }
+
+    function admin() {
+      return signedIn() && request.auth.token.admin == true;
+    }
+
+    function validProfile(data) {
+      return data.keys().hasAll([
+          'userName', 'accountID', 'profileImageURL',
+          'bio', 'createdAt', 'updatedAt'
+        ])
+        && data.keys().hasOnly([
+          'userName', 'accountID', 'profileImageURL',
+          'bio', 'createdAt', 'updatedAt',
+          'acceptedTermsVersion', 'acceptedTermsAt', 'confirmedAge18Plus'
+        ])
+        && data.userName is string
+        && data.userName.size() >= 1
+        && data.userName.size() <= 20
+        && data.accountID is string
+        && data.accountID.size() >= 1
+        && data.accountID.size() <= 160
+        && data.profileImageURL is string
+        && data.profileImageURL.size() <= 1000
+        && data.bio is string
+        && data.bio.size() <= 100
+        && validTerms(data);
+    }
+
+    function validTerms(data) {
+      return !data.keys().hasAny([
+          'acceptedTermsVersion', 'acceptedTermsAt', 'confirmedAge18Plus'
+        ])
+        || (
+          data.keys().hasAll([
+            'acceptedTermsVersion', 'acceptedTermsAt', 'confirmedAge18Plus'
+          ])
+          && data.acceptedTermsVersion is string
+          && data.acceptedTermsVersion.size() >= 1
+          && data.acceptedTermsVersion.size() <= 30
+          && data.acceptedTermsAt is timestamp
+          && data.confirmedAge18Plus == true
+        );
+    }
+
+    function existingPost(postID) {
+      return get(/databases/$(database)/documents/posts/$(postID)).data;
+    }
+
+    match /users/{userID} {
+      // 利用規約同意情報も含むため、本人または管理者だけが読める。
+      allow read: if owns(userID) || admin();
+
+      allow create: if owns(userID)
+        && validProfile(request.resource.data)
+        && request.resource.data.accountID == 'guest_' + request.auth.uid
+        && request.resource.data.createdAt == request.time
+        && request.resource.data.updatedAt == request.time;
+
+      allow update: if owns(userID)
+        && validProfile(request.resource.data)
+        && request.resource.data.accountID == resource.data.accountID
+        && request.resource.data.createdAt == resource.data.createdAt
+        && request.resource.data.updatedAt == request.time
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          'userName', 'profileImageURL', 'bio', 'updatedAt',
+          'acceptedTermsVersion', 'acceptedTermsAt', 'confirmedAge18Plus'
+        ]);
+
+      allow delete: if admin();
+
+      match /blockedUsers/{blockedUserID} {
+        allow get: if owns(userID);
+        allow list: if owns(userID)
+          && request.query.limit != null
+          && request.query.limit <= 200;
+
+        allow create: if owns(userID)
+          && blockedUserID != userID
+          && exists(/databases/$(database)/documents/users/$(blockedUserID))
+          && request.resource.data.keys().hasOnly([
+            'blockedUserID', 'displayName', 'blockedAt'
+          ])
+          && request.resource.data.blockedUserID == blockedUserID
+          && request.resource.data.displayName is string
+          && request.resource.data.displayName.size() >= 1
+          && request.resource.data.displayName.size() <= 20
+          && request.resource.data.blockedAt == request.time;
+
+        allow update: if false;
+        allow delete: if owns(userID);
+      }
+
+      match /hiddenPosts/{postID} {
+        allow get: if owns(userID);
+        allow list: if owns(userID)
+          && request.query.limit != null
+          && request.query.limit <= 200;
+
+        allow create: if owns(userID)
+          && request.resource.data.keys().hasOnly([
+            'postID', 'authorID', 'hiddenAt'
+          ])
+          && request.resource.data.postID == postID
+          && request.resource.data.authorID == existingPost(postID).authorID
+          && request.resource.data.hiddenAt == request.time;
+
+        allow update: if false;
+        allow delete: if owns(userID);
+      }
+    }
+
+    match /posts/{postID} {
+      allow get: if signedIn();
+      allow list: if signedIn()
+        && request.query.limit != null
+        && request.query.limit <= 50;
+
+      allow create: if signedIn()
+        && request.resource.data.keys().hasOnly([
+          'authorName', 'subject', 'change', 'selectedDate',
+          'selectedChange', 'authorID', 'createdAt'
+        ])
+        && request.resource.data.authorID == request.auth.uid
+        && request.resource.data.authorName is string
+        && request.resource.data.authorName.size() >= 1
+        && request.resource.data.authorName.size() <= 20
+        && request.resource.data.authorName
+          == get(/databases/$(database)/documents/users/$(request.auth.uid)).data.userName
+        && request.resource.data.subject is string
+        && request.resource.data.subject.size() >= 1
+        && request.resource.data.subject.size() <= 40
+        && request.resource.data.change is string
+        && request.resource.data.change.size() >= 1
+        && request.resource.data.change.size() <= 20
+        && request.resource.data.selectedDate in [
+          '昨日', '一週間前', '一ヶ月前', '半年前', '一年前'
+        ]
+        && request.resource.data.selectedChange in [
+          '上がった', '増えた', '下がった', '減った'
+        ]
+        && request.resource.data.createdAt == request.time;
+
+      allow update: if false;
+      allow delete: if signedIn()
+        && (resource.data.authorID == request.auth.uid || admin());
+    }
+
+    match /reports/{reportID} {
+      // UIDと投稿IDの固定IDにし、同じ利用者の重複通報を防止する。
+      allow create: if signedIn()
+        && request.resource.data.keys().hasOnly([
+          'reporterID', 'postID', 'reportedUserID', 'reason',
+          'postAuthorName', 'postSubject', 'postChange', 'status', 'createdAt'
+        ])
+        && reportID == request.auth.uid + '_' + request.resource.data.postID
+        && request.resource.data.reporterID == request.auth.uid
+        && request.resource.data.reportedUserID != request.auth.uid
+        && request.resource.data.reportedUserID
+          == existingPost(request.resource.data.postID).authorID
+        && request.resource.data.postAuthorName
+          == existingPost(request.resource.data.postID).authorName
+        && request.resource.data.postSubject
+          == existingPost(request.resource.data.postID).subject
+        && request.resource.data.postChange
+          == existingPost(request.resource.data.postID).change
+        && request.resource.data.reason in [
+          '嫌がらせ・いじめ', '差別的・攻撃的な内容',
+          '性的または不適切な内容', '暴力・脅迫',
+          '個人情報の公開', 'スパム・宣伝', 'その他'
+        ]
+        && request.resource.data.status == 'pending'
+        && request.resource.data.createdAt == request.time;
+
+      allow read, update, delete: if admin();
+    }
+  }
+}

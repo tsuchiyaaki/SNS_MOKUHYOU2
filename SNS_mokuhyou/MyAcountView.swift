@@ -45,6 +45,31 @@ struct MyAcountView: View {
                     }
                     .buttonStyle(.bordered)
 
+                    VStack(spacing: 12) {
+                        NavigationLink {
+                            BlockedUsersView()
+                        } label: {
+                            Label("ブロック管理", systemImage: "person.crop.circle.badge.xmark")
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                        }
+
+                        NavigationLink {
+                            TermsOfServiceView()
+                        } label: {
+                            Label("利用規約・コミュニティルール", systemImage: "doc.text")
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                        }
+
+                        NavigationLink {
+                            SupportView()
+                        } label: {
+                            Label("お問い合わせ・安全", systemImage: "questionmark.circle")
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                        }
+                    }
+                    .buttonStyle(.bordered)
+                    .padding(.horizontal)
+
                     Divider()
                         .background(Color.black.opacity(0.2))
 
@@ -56,7 +81,7 @@ struct MyAcountView: View {
                     } else {
                         VStack(spacing: 25) {
                             ForEach(myPosts) { post in
-                                FeedCard(post: post, iconColor: .red)
+                                ModeratedPostCard(post: post, iconColor: .red)
                             }
                         }
                         .padding(.horizontal)

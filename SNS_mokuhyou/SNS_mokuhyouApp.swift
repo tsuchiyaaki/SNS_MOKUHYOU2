@@ -1,4 +1,5 @@
 import SwiftUI
+import FirebaseAppCheck
 import FirebaseCore
 
 final class AppDelegate: NSObject, UIApplicationDelegate {
@@ -6,6 +7,7 @@ final class AppDelegate: NSObject, UIApplicationDelegate {
         _ application: UIApplication,
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil
     ) -> Bool {
+        AppCheck.setAppCheckProviderFactory(EvolglamAppCheckProviderFactory())
         FirebaseApp.configure()
         return true
     }
@@ -17,20 +19,30 @@ struct SNS_mokuhyouApp: App {
     @StateObject private var authManager = AuthManager()
     @StateObject private var userStore = UserStore()
     @StateObject private var postStore = PostStore()
+    @AppStorage("acceptedTermsVersion") private var acceptedTermsVersion = ""
 
     var body: some Scene {
         WindowGroup {
-            TabView {
-                TimelineView()
-                    .tabItem {
-                        Image(systemName: "house.fill")
-                    }
+            Group {
+                if acceptedTermsVersion == AppConfiguration.termsVersion {
+                    TabView {
+                        TimelineView()
+                            .tabItem {
+                                Label("タイムライン", systemImage: "house.fill")
+                            }
 
-                NavigationStack {
-                    SearchView()
-                }
-                .tabItem {
-                    Image( systemName: "magnifyingglass")
+                        NavigationStack {
+                            SearchView()
+                        }
+                        .tabItem {
+                            Label("検索", systemImage: "magnifyingglass")
+                        }
+                    }
+                    .tint(.red)
+                } else {
+                    TermsAgreementView {
+                        acceptedTermsVersion = AppConfiguration.termsVersion
+                    }
                 }
             }
             .environmentObject(authManager)

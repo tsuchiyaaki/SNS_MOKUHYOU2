@@ -24,6 +24,9 @@ struct TimelineView: View {
                 if authManager.isSignedIn {
                     await userStore.prepareCurrentUser()
                     postStore.startListening()
+                    try? await userStore.recordTermsAcceptance(
+                        version: AppConfiguration.termsVersion
+                    )
                 } else {
                     authManager.signInIfNeeded()
                 }
@@ -98,18 +101,7 @@ struct TimelineView: View {
                 ScrollView(showsIndicators: false) {
                     VStack(spacing: 25) {
                         ForEach(postStore.posts) { post in
-                            FeedCard(post: post, iconColor: .red)
-                                .contextMenu {
-                                    if post.authorID == authManager.userID {
-                                        Button(role: .destructive) {
-                                            Task {
-                                                await postStore.deletePost(post)
-                                            }
-                                        } label: {
-                                            Label("削除", systemImage: "trash")
-                                        }
-                                    }
-                                }
+                            ModeratedPostCard(post: post, iconColor: .red)
                         }
                     }
                     .padding(.horizontal)

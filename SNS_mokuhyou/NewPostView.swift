@@ -19,7 +19,7 @@ struct NewPostView: View {
     @State private var isPosting = false
     @State private var errorMessage: String?
 
-    private let sectionDates = ["昨日", "一週間", "一ヶ月", "半年", "一年"]
+    private let sectionDates = ["昨日", "一週間前", "一ヶ月前", "半年前", "一年前"]
     private let sectionChanges = ["上がった", "増えた", "下がった", "減った"]
 
     private var trimmedSubject: String {

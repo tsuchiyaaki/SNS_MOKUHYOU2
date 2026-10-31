@@ -1,7 +1,6 @@
 import SwiftUI
 
 struct SearchView: View {
-    @EnvironmentObject private var authManager: AuthManager
     @EnvironmentObject private var postStore: PostStore
 
     @State private var searchText = ""
@@ -105,18 +104,7 @@ struct SearchView: View {
             ScrollView(showsIndicators: false) {
                 LazyVStack(spacing: 20) {
                     ForEach(filteredPosts) { post in
-                        FeedCard(post: post, iconColor: .red)
-                            .contextMenu {
-                                if post.authorID == authManager.userID {
-                                    Button(role: .destructive) {
-                                        Task {
-                                            await postStore.deletePost(post)
-                                        }
-                                    } label: {
-                                        Label("削除", systemImage: "trash")
-                                    }
-                                }
-                            }
+                        ModeratedPostCard(post: post, iconColor: .red)
                     }
                 }
                 .padding(.horizontal)
@@ -132,4 +120,3 @@ struct SearchView: View {
         )
     }
 }
-

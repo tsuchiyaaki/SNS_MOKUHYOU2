@@ -125,11 +125,26 @@ final class UserStore: ObservableObject {
             throw UserStoreError.invalidInput
         }
 
+        try ContentSafetyFilter.validate(trimmedName, trimmedBio)
+
         try await db.collection("users").document(uid).updateData([
             "userName": trimmedName,
             "bio": trimmedBio,
             "updatedAt": FieldValue.serverTimestamp()
         ])
+    }
+
+    func recordTermsAcceptance(version: String) async throws {
+        guard let uid = Auth.auth().currentUser?.uid else {
+            throw UserStoreError.notSignedIn
+        }
+
+        try await db.collection("users").document(uid).setData([
+            "acceptedTermsVersion": version,
+            "acceptedTermsAt": FieldValue.serverTimestamp(),
+            "confirmedAge18Plus": true,
+            "updatedAt": FieldValue.serverTimestamp()
+        ], merge: true)
     }
 
     func stopListening() {
